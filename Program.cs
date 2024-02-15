@@ -64,9 +64,14 @@ if (builder.Environment.IsProduction())
 }
 else
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+    var connectionBuilder = new PostgreSqlConnectionStringBuilder(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."))
+    {
+        Pooling = true,
+        TrustServerCertificate = true,
+        SslMode = SslMode.Require
+    };
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
+        options.UseNpgsql(connectionBuilder.ConnectionString), ServiceLifetime.Singleton);
 }
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 

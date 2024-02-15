@@ -11,8 +11,8 @@ namespace OCWebOverview.Data.Database
             Database.Migrate();
         }
 
-        public required DbSet<Client> Clients { get; set; }
-        public required DbSet<Werknemer> Werknemers { get; set; }
-        public required DbSet<Gemeente> Gemeentes { get; set; }
+        public DbSet<Client> Clients { get; set; }
+        public DbSet<Werknemer> Werknemers { get; set; }
+        public DbSet<Gemeente> Gemeentes { get; set; }
     }
 }
