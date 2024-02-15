@@ -85,8 +85,8 @@ else
 }
 
 app.UseHttpsRedirection();
-app.UseForwardedHeaders();
 app.UseStaticFiles();
+app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
@@ -94,5 +94,4 @@ app.MapRazorComponents<App>()
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
 
-app.UseRouting();
 app.Run();
