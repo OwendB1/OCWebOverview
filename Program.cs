@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
@@ -8,6 +9,7 @@ using OCWebOverview.Components;
 using OCWebOverview.Components.Account;
 using OCWebOverview.Data.Collections;
 using OCWebOverview.Data.Database;
+using OCWebOverview.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +60,9 @@ var connectionBuilder = new PostgreSqlConnectionStringBuilder(builder.Environmen
     TrustServerCertificate = true,
     SslMode = SslMode.Require
 };
+
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionBuilder.ConnectionString), ServiceLifetime.Singleton);
