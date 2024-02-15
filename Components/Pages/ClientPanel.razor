@@ -1,0 +1,120 @@
+﻿@page "/clienten"
+@using Microsoft.AspNetCore.Authorization
+@using OCWebOverview.Components.Dialogs
+@using OCWebOverview.Data.Collections
+@using OCWebOverview.Data.Entities
+@attribute [Authorize]
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject ClientCollection ClientCollection
+@inject GemeenteCollection GemeenteCollection
+@inject WerknemerCollection WerknemerCollection
+
+<h3>Clienten</h3>
+
+<MudButton Class="mb-2" Variant="Variant.Filled" OnClick="Create">Voeg nieuwe Cliënt toe</MudButton>
+
+<MudTable Items="@Clients" Dense="false" Hover="true" Bordered="false" Striped="false" Filter="new Func<Client,bool>(FilterFunc)">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Cliënten</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Naam</MudTh>
+        <MudTh>Start Datum</MudTh>
+        <MudTh>Eind Datum</MudTh>
+        <MudTh>Zorg Uren</MudTh>
+        <MudTh>Zorg Type</MudTh>
+        <MudTh>Hoofd werknemer</MudTh>
+        <MudTh>Postcode & Huisnummer</MudTh>
+        <MudTh>Gemeente</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Naam">@context.Initialen @context.Achternaam</MudTd>
+        <MudTd DataLabel="Start Datum">@context.StartDatum.ToShortDateString()</MudTd>
+        <MudTd DataLabel="Eind Datum">@context.EindDatum.ToShortDateString()</MudTd>
+        <MudTd DataLabel="Zorg Uren">@context.ZorgUren</MudTd>
+        <MudTd DataLabel="Zorg Type">@context.ZorgType</MudTd>
+            <MudTd DataLabel="Hoofd Werknemer">@Werknemers.First(w => w.Id == context.HoofdWerknemerId).Initialen @Werknemers.First(w => w.Id == context.HoofdWerknemerId).Achternaam</MudTd>
+        <MudTd DataLabel="PC & Hnmr">@context.Adres.Postcode, @context.Adres.HuisNummer</MudTd>
+        <MudTd DataLabel="Gemeente">@Gemeentes.First(g => g.Id == context.GemeenteId).Naam</MudTd>
+        <MudTd DataLabel="Buttons">
+            <div class="d-inline-flex">
+                <MudButton Variant="Variant.Filled" OnClick="() => Edit(context)" Class="mr-2">Edit</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="() => Remove(context.Id)">Remove</MudButton>
+            </div>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private IEnumerable<Client> Clients;
+    private IEnumerable<Gemeente> Gemeentes;
+    private IEnumerable<Werknemer> Werknemers;
+    private string searchString = "";
+
+    protected override void OnInitialized()
+    {
+        Clients = ClientCollection.GetAllClients();
+        Gemeentes = GemeenteCollection.GetAllGemeentes();
+        Werknemers = WerknemerCollection.GetAllWerknemers();
+    }
+
+    private async Task Create()
+    {
+        var parameters = new DialogParameters
+        {
+            { "Client", new Client("", "", DateTime.Today, DateTime.Today, 0, Guid.Empty, new List<Guid>(), ZorgType.Jeugd, Guid.Empty, new Adres("", "", "", "")) },
+            { "ButtonText", "Toevoegen" }
+        };
+        var dialog = await DialogService.ShowAsync<ClientDialog>("Nieuwe Cliënt Toevoegen", parameters);
+        var result = await dialog.Result;
+        if (result.Canceled) return;
+
+        var client = (Client)result.Data;
+        ClientCollection.AddClient(client);
+        Snackbar.Add("Nieuwe Cliënt toegevoegd", Severity.Success);
+        Clients = ClientCollection.GetAllClients();
+        StateHasChanged();
+    }
+
+    private async Task Edit(Client item)
+    {
+        var parameters = new DialogParameters
+        {
+            { "Client", item },
+            { "ButtonText", "Aanpassen" }
+        };
+        var dialog = await DialogService.ShowAsync<ClientDialog>("Bestaande Cliënt Aanpassen", parameters);
+        var result = await dialog.Result;
+        if (result.Canceled) return;
+
+        var client = (Client)result.Data;
+        ClientCollection.EditClient(client);
+        Snackbar.Add("Bestaande Cliënt aangepast", Severity.Success);
+        Clients = ClientCollection.GetAllClients();
+        StateHasChanged();
+    }
+
+    private void Remove(Guid id)
+    {
+        ClientCollection.RemoveClient(id);
+        Snackbar.Add("Cliënt verwijderd", Severity.Success);
+        Clients = ClientCollection.GetAllClients();
+        StateHasChanged();
+    }
+
+    private bool FilterFunc(Client element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString)) return true;
+        if (element.Achternaam.Contains(searchString)) return true;
+        if (element.Adres.Postcode.Contains(searchString)) return true;
+        if (element.StartDatum.Date.ToShortDateString().Contains(searchString)) return true;
+        return element.ZorgUren == int.Parse(searchString);
+    }
+}

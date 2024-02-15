@@ -1,0 +1,108 @@
+﻿@page "/werknemers"
+@using Microsoft.AspNetCore.Authorization
+@using OCWebOverview.Components.Dialogs
+@using OCWebOverview.Data.Collections
+@using OCWebOverview.Data.Entities
+@attribute [Authorize]
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject WerknemerCollection WerknemerCollection
+
+<h3>Werknemers</h3>
+
+<MudButton Class="mb-2" Variant="Variant.Filled" OnClick="Create">Voeg nieuwe Werknemer toe</MudButton>
+
+<MudTable Items="@Werknemers" Dense="false" Hover="true" Bordered="false" Striped="false" Filter="new Func<Werknemer,bool>(FilterFunc)">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Werknemers</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Naam</MudTh>
+        <MudTh>Kleur</MudTh>
+        <MudTh>Start Datum</MudTh>
+        <MudTh>Actief?</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Naam">@context.Initialen @context.Achternaam</MudTd>
+        <MudTd DataLabel="Kleur">
+                <MudIcon Size="Size.Medium" Icon="@Icons.Material.Rounded.Square" Style="@($"color:{context.ColorHexCode};")" />
+        </MudTd>
+            <MudTd DataLabel="Start Datum">@context.StartDatum.ToShortDateString()</MudTd>
+        <MudTd DataLabel="Actief">
+            <MudCheckBox @bind-Value="context.IsActiveInOverview" ReadOnly="true"/>
+        </MudTd>
+        <MudTd DataLabel="Buttons">
+            <div class="d-inline-flex">
+                <MudButton Variant="Variant.Filled" OnClick="() => Edit(context)" Class="mr-2">Edit</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="() => Remove(context.Id)">Remove</MudButton>
+            </div>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+    @code {
+    private IEnumerable<Werknemer> Werknemers;
+    private string searchString = "";
+
+    protected override void OnInitialized()
+    {
+        Werknemers = WerknemerCollection.GetAllWerknemers();
+    }
+
+    private async Task Create()
+    {
+        var parameters = new DialogParameters
+        {
+            { "Werknemer", new Werknemer("", "", DateTime.Today, "", true) },
+            { "ButtonText", "Toevoegen" }
+        };
+        var dialog = await DialogService.ShowAsync<WerknemerDialog>("Nieuwe Werknemer Toevoegen", parameters);
+        var result = await dialog.Result;
+        if (result.Canceled) return;
+
+        var werknemer = (Werknemer)result.Data;
+        WerknemerCollection.AddWerknemer(werknemer);
+        Snackbar.Add("Nieuwe Werknemer toegevoegd", Severity.Success);
+        Werknemers = WerknemerCollection.GetAllWerknemers();
+        StateHasChanged();
+    }
+
+    private async Task Edit(Werknemer item)
+    {
+        var parameters = new DialogParameters
+        {
+            { "Werknemer", item },
+            { "ButtonText", "Aanpassen" }
+        };
+        var dialog = await DialogService.ShowAsync<WerknemerDialog>("Bestaande Werknemer Aanpassen", parameters);
+        var result = await dialog.Result;
+        if (result.Canceled) return;
+
+        var werknemer = (Werknemer)result.Data;
+        WerknemerCollection.EditWerknemer(werknemer);
+        Snackbar.Add("Bestaande Cliënt aangepast", Severity.Success);
+        Werknemers = WerknemerCollection.GetAllWerknemers();
+        StateHasChanged();
+    }
+
+    private void Remove(Guid id)
+    {
+        WerknemerCollection.RemoveWerknemer(id);
+        Snackbar.Add("Werknemer verwijderd", Severity.Success);
+        Werknemers = WerknemerCollection.GetAllWerknemers();
+        StateHasChanged();
+    }
+
+    private bool FilterFunc(Werknemer element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString)) return true;
+        if (element.Achternaam.Contains(searchString)) return true;
+        return element.StartDatum.Date.ToShortDateString().Contains(searchString);
+    }
+}

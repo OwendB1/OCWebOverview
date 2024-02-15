@@ -1,0 +1,84 @@
+﻿@using OCWebOverview.Data.Entities
+@using OCWebOverview.Data.Collections
+@inject WerknemerCollection WerknemerCollection
+@inject GemeenteCollection GemeenteCollection
+@inject ISnackbar Snackbar
+
+<EditForm Model="@Client" OnValidSubmit="Submit">
+    <DataAnnotationsValidator/>
+    <MudDialog>
+        <DialogContent>
+            <MudGrid>
+                <MudItem xs="3">
+                    <MudTextField @bind-Value="Client.Initialen" Label="Initialen" For="() => Client.Initialen"/>
+                </MudItem>
+                <MudItem xs="9">
+                    <MudTextField @bind-Value="Client.Achternaam" Label="Achternaam" For="() => Client.Achternaam"/>
+                </MudItem>
+            </MudGrid>
+            <MudDatePicker @bind-Value="Client.StartDatum" Date="Client.StartDatum" Label="Start Datum" Required="true" />
+            <MudDatePicker @bind-Value="Client.StartDatum" Date="Client.EindDatum" Label="Eind Datum" Required="true" />
+            <MudNumericField @bind-Value="Client.ZorgUren" Label="Aantal Zorg Uren" For="() => Client.ZorgUren"/>
+            <MudSelect @bind-Value="Client.HoofdWerknemerId" Label="Hoofd Werknemer" For="() => Client.HoofdWerknemerId">
+                @foreach (var werknemer in WerknemerCollection.GetAllWerknemers().Where(w => w.IsActiveInOverview))
+                {
+                    <MudSelectItem Value="werknemer.Id">@werknemer.Initialen @werknemer.Achternaam</MudSelectItem>
+                }
+            </MudSelect>
+            <MudSelect T="Guid" @bind-SelectedValues="Extras" MultiSelection="true" Label="Ondersteunende Werknemers">
+                @foreach (var werknemer in WerknemerCollection.GetAllWerknemers().Where(w => w.IsActiveInOverview))
+                {
+                    <MudSelectItem Value="werknemer.Id">@werknemer.Initialen @werknemer.Achternaam</MudSelectItem>
+                }
+            </MudSelect>
+            <MudSelect @bind-Value="Client.ZorgType" Label="Zorg Type" For="() => Client.ZorgType">
+                <MudSelectItem Value="ZorgType.Jeugd"/>
+                <MudSelectItem Value="ZorgType.WMO"/>
+            </MudSelect>
+            <MudSelect @bind-Value="Client.GemeenteId" Label="Gemeente" For="() => Client.GemeenteId">
+                @foreach (var gemeente in GemeenteCollection.GetAllGemeentes())
+                {
+                    <MudSelectItem Value="gemeente.Id">@gemeente.Naam</MudSelectItem>
+                }
+            </MudSelect>
+            <MudText Typo="Typo.h6">Adres</MudText>
+            <MudGrid>
+                <MudItem xs="9">
+                    <MudTextField @bind-Value="Client.Adres.Straat" Label="Straat" For="() => Client.Adres.Straat" />
+                </MudItem>
+                <MudItem xs="3">
+                    <MudTextField @bind-Value="Client.Adres.HuisNummer" Label="Huisnummer" For="() => Client.Adres.HuisNummer" />
+                </MudItem>
+            </MudGrid>
+            <MudTextField @bind-Value="Client.Adres.Postcode" Label="Postcode" For="() => Client.Adres.Postcode" />
+            <MudTextField @bind-Value="Client.Adres.Plaats" Label="Plaats" For="() => Client.Adres.Plaats" />
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel">Cancel</MudButton>
+            <MudButton ButtonType="ButtonType.Submit">@ButtonText</MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Client Client { get; set; }
+    [Parameter] public string ButtonText { get; set; }
+    private IEnumerable<Guid> Extras { get; set; } = new HashSet<Guid>();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void Submit()
+    {
+        if (Client.ExtraWerknemerIds.Contains(Client.HoofdWerknemerId))
+        {
+            Snackbar.Add("Het is niet toegestaan om de hoofdwerknemer ook nog eens in de lijst van ondersteunende werknemers te zetten.", Severity.Error);
+            return;
+        }
+        Client.ExtraWerknemerIds = Extras.ToList();
+        MudDialog.Close(DialogResult.Ok(Client));
+    }
+}

@@ -1,0 +1,62 @@
+﻿@page "/overview"
+@using OCWebOverview.Data.Collections
+@using OCWebOverview.Data.Entities
+@inject ClientCollection ClientCollection
+@inject GemeenteCollection GemeenteCollection
+@inject WerknemerCollection WerknemerCollection
+
+<div class="d-inline-flex pa-2" style="height: 98.8vh">
+    @foreach (var werknemer in Werknemers)
+    {
+        var clientsPerWerknemer = Clients.Where(c => c.HoofdWerknemerId == werknemer.Id);
+        <MudPaper Class="ma-1" MinWidth="350px" Style="display: flex; flex-direction: column;">
+            <div class="pa-3 d-inline-flex align-items-center">
+                <MudText Typo="Typo.h6">@werknemer.Initialen @werknemer.Achternaam</MudText>
+                <MudIcon Size="Size.Medium" Icon="@Icons.Material.Rounded.Square" Style="@($"color:{werknemer.ColorHexCode};")"/>
+            </div>
+            <MudSimpleTable Class="pt-1" Elevation="0" Style="overflow-y: auto" FixedHeader="true" Dense="true">
+                <thead>
+                    <tr>
+                        <th>Cliënten</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var client in clientsPerWerknemer)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-inline-flex align-items-center" style="white-space: nowrap;">
+                                <MudText Typo="Typo.body1">@client.Initialen @client.Achternaam | Type: @client.ZorgType | Uren: @client.ZorgUren | </MudText>
+                                <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Dark"/>
+                                <MudText Typo="Typo.body1">@client.ExtraWerknemerIds.Count</MudText>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </MudSimpleTable>
+        </MudPaper>
+    }
+</div>
+
+@code {
+    private IEnumerable<Client> Clients;
+    private IEnumerable<Gemeente> Gemeentes;
+    private IEnumerable<Werknemer> Werknemers;
+
+    protected override void OnInitialized()
+    {
+        ClientCollection.DataChanged += StateChange;
+        GemeenteCollection.DataChanged += StateChange;
+        WerknemerCollection.DataChanged += StateChange;
+
+        Clients = ClientCollection.GetAllClients();
+        Gemeentes = GemeenteCollection.GetAllGemeentes();
+        Werknemers = WerknemerCollection.GetAllWerknemers().Where(werknemer => werknemer.IsActiveInOverview);
+    }
+
+    private async void StateChange(object? sender, EventArgs e)
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+}

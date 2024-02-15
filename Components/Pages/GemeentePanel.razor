@@ -1,0 +1,102 @@
+﻿@page "/gemeentes"
+@using Microsoft.AspNetCore.Authorization
+@using OCWebOverview.Components.Dialogs
+@using OCWebOverview.Data.Collections
+@using OCWebOverview.Data.Entities
+@attribute [Authorize]
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject GemeenteCollection GemeenteCollection
+
+<h3>Gemeentes</h3>
+
+<MudButton Class="mb-2" Variant="Variant.Filled" OnClick="Create">Voeg nieuwe gemeente toe</MudButton>
+
+<MudTable Items="@Gemeentes" Dense="false" Hover="true" Bordered="false" Striped="false" Filter="new Func<Gemeente,bool>(FilterFunc)">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Gemeentes</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Naam</MudTh>
+        <MudTh>Kantoor Locatie</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Naam">@context.Naam</MudTd>
+        <MudTd DataLabel="Locatie">@context.KantoorLocatie.Straat @context.KantoorLocatie.HuisNummer, @context.KantoorLocatie.Postcode, @context.KantoorLocatie.Plaats</MudTd>
+        <MudTd DataLabel="Buttons">
+            <div class="d-inline-flex">
+                <MudButton Variant="Variant.Filled" OnClick="() => Edit(context)" Class="mr-2">Edit</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="() => Remove(context.Id)">Remove</MudButton>
+            </div>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+    @code {
+    private IEnumerable<Gemeente> Gemeentes;
+    private string searchString = "";
+
+    protected override void OnInitialized()
+    {
+        Gemeentes = GemeenteCollection.GetAllGemeentes();
+    }
+
+    private async Task Create()
+    {
+        var parameters = new DialogParameters
+        {
+            { "Gemeente", new Gemeente("", new Adres("", "", "", "")) },
+            { "ButtonText", "Toevoegen" }
+        };
+        var dialog = await DialogService.ShowAsync<GemeenteDialog>("Nieuwe Gemeente Toevoegen", parameters);
+        var result = await dialog.Result;
+        if (result.Canceled) return;
+
+        var gemeente = (Gemeente)result.Data;
+        GemeenteCollection.AddGemeente(gemeente);
+        Snackbar.Add("Nieuwe Gemeente toegevoegd", Severity.Success);
+        Gemeentes = GemeenteCollection.GetAllGemeentes();
+        StateHasChanged();
+    }
+
+    private async Task Edit(Gemeente item)
+    {
+        var parameters = new DialogParameters
+        {
+            { "Gemeente", item },
+            { "ButtonText", "Aanpassen" }
+        };
+        var dialog = await DialogService.ShowAsync<GemeenteDialog>("Bestaande Gemeente Aanpassen", parameters);
+        var result = await dialog.Result;
+        if (result.Canceled) return;
+
+        var gemeente = (Gemeente)result.Data;
+        GemeenteCollection.EditGemeente(gemeente);
+        Snackbar.Add("Bestaande Cliënt aangepast", Severity.Success);
+        Gemeentes = GemeenteCollection.GetAllGemeentes();
+        StateHasChanged();
+    }
+
+    private void Remove(Guid id)
+    {
+        GemeenteCollection.RemoveGemeente(id);
+        Snackbar.Add("Gemeente verwijderd", Severity.Success);
+        Gemeentes = GemeenteCollection.GetAllGemeentes();
+        StateHasChanged();
+    }
+
+    private bool FilterFunc(Gemeente element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString)) return true;
+        if (element.Naam.Contains(searchString)) return true;
+        if (element.KantoorLocatie.Postcode.Contains(searchString)) return true;
+        if (element.KantoorLocatie.Straat.Contains(searchString)) return true;
+        return element.KantoorLocatie.Plaats.Contains(searchString);
+    }
+}

@@ -1,0 +1,42 @@
+﻿@using OCWebOverview.Data.Entities
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@Gemeente">
+            <DataAnnotationsValidator/>
+            <MudTextField @bind-Value="Gemeente.Naam" Label="Naam"/>
+            <br/>
+            <MudText Typo="Typo.body1">Hoofdkantoor Locatie</MudText>
+            <MudGrid>
+                <MudItem xs="9">
+                    <MudTextField @bind-Value="Gemeente.KantoorLocatie.Straat" Label="Straat"/>
+                </MudItem>
+                <MudItem xs="3">
+                    <MudTextField @bind-Value="Gemeente.KantoorLocatie.HuisNummer" Label="Huisnummer"/>
+                </MudItem>
+            </MudGrid>
+            <MudTextField @bind-Value="Gemeente.KantoorLocatie.Postcode" Label="Postcode"/>
+            <MudTextField @bind-Value="Gemeente.KantoorLocatie.Plaats" Label="Plaats"/>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton OnClick="Submit">@ButtonText</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Gemeente Gemeente { get; set; }
+    [Parameter] public string ButtonText { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(Gemeente));
+    }
+}

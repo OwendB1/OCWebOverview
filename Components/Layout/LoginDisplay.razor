@@ -1,0 +1,21 @@
+﻿@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized>
+        <MudLink Class="px-4 d-none d-sm-flex" Color="Color.Info" Href="Account/Manage" Target="_blank">Welkom, @context.User.Identity?.Name</MudLink>
+        <a Class="px-2 d-flex d-sm-none" href="Account/Manage">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Info"/>
+        </a>
+        <div class="nav-item px-3">
+            <form action="Account/Logout" method="post">
+                <AntiforgeryToken/>
+                <input type="hidden" name="ReturnUrl" value=""/>
+                <MudButton Class="nav-link" Color="Color.Error" Variant="Variant.Filled" ButtonType="ButtonType.Submit" Size="Size.Small">Log out</MudButton>
+            </form>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <MudButton Class="mx-1" Color="Color.Secondary" Variant="Variant.Filled" Href="Account/Register" Size="Size.Small">Register</MudButton>
+        <MudButton Class="mx-1" Color="Color.Success" Variant="Variant.Filled" Href="Account/Login" Size="Size.Small">Log in</MudButton>
+    </NotAuthorized>
+</AuthorizeView>

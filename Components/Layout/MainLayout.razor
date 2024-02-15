@@ -1,0 +1,66 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavManager
+
+<MudThemeProvider Theme="_omnisCuraTheme" />
+<MudDialogProvider MaxWidth="MaxWidth.ExtraExtraLarge" DisableBackdropClick="true"/>
+<MudSnackbarProvider />
+
+@if (NavManager.Uri.Contains("overview") == false && NavManager.Uri.Contains("Account") == false)
+{
+    <MudLayout>
+        <MudAppBar Elevation="0">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            <MudSpacer />
+            <LoginDisplay />
+        </MudAppBar>
+        <MudDrawer @bind-Open="@_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.h6">Omnis Cura</MudText>
+            </MudDrawerHeader>
+            <NavMenu />
+        </MudDrawer>
+        <MudMainContent>
+            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="pa-2; overflow-x-scroll;">
+                @Body
+            </MudContainer>
+        </MudMainContent>
+    </MudLayout>
+}
+else
+{
+    @Body
+}
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+@code {
+    bool _drawerOpen;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    MudTheme _omnisCuraTheme = new ()
+    {
+        Palette = new PaletteLight()
+        {
+            Primary = Colors.Orange.Default,
+            Secondary = Colors.Green.Accent4,
+            Info = Colors.Shades.White,
+            AppbarBackground = Colors.Grey.Darken3,
+            TableHover = Colors.Orange.Accent2,
+            ChipDefaultHover = Colors.Orange.Default
+        },
+
+        LayoutProperties = new LayoutProperties()
+        {
+            DrawerWidthLeft = "260px",
+            DrawerWidthRight = "300px"
+        }
+    };
+}

@@ -1,0 +1,40 @@
+﻿@using OCWebOverview.Data.Entities
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@Werknemer">
+            <DataAnnotationsValidator/>
+            <MudGrid>
+                <MudItem xs="3">
+                    <MudTextField @bind-Value="Werknemer.Initialen" Label="Initialen"/>
+                </MudItem>
+                <MudItem xs="9">
+                    <MudTextField @bind-Value="Werknemer.Achternaam" Label="Achternaam"/>
+                </MudItem>
+            </MudGrid>
+            <MudDatePicker @bind-Value="Werknemer.StartDatum" Date="Werknemer.StartDatum" Label="Start Datum" />
+            <MudColorPicker @bind-Text="Werknemer.ColorHexCode" Label="Kleur" ColorPickerMode="ColorPickerMode.HEX"/>
+            <MudSwitch @bind-Value="Werknemer.IsActiveInOverview" Label="Zichtbaar in overview?" Color="Color.Success"/>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton OnClick="Submit">@ButtonText</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Werknemer Werknemer { get; set; }
+    [Parameter] public string ButtonText { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(Werknemer));
+    }
+}
