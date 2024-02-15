@@ -5,20 +5,20 @@ using SendGrid.Helpers.Mail;
 
 namespace OCWebOverview.Services
 {
-    public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
+    public class EmailSender(IOptions<AuthOptions> optionsAccessor,
             ILogger<EmailSender> logger) : IEmailSender
     {
         private readonly ILogger _logger = logger;
 
-        public AuthMessageSenderOptions Options { get; } = optionsAccessor.Value; //Set with Secret Manager.
+        public AuthOptions MessageSenderOptions { get; } = optionsAccessor.Value; //Set with Secret Manager.
 
         public async Task SendEmailAsync(string toEmail, string subject, string message)
         {
-            if (string.IsNullOrEmpty(Options.SendGridKey))
+            if (string.IsNullOrEmpty(MessageSenderOptions.SendGridKey))
             {
                 throw new Exception("Null SendGridKey");
             }
-            await Execute(Options.SendGridKey, subject, message, toEmail);
+            await Execute(MessageSenderOptions.SendGridKey, subject, message, toEmail);
         }
 
         public async Task Execute(string apiKey, string subject, string message, string toEmail)

@@ -1,5 +1,9 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using OCWebOverview.Services
+@using Microsoft.Extensions.Options
+@inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IOptions<AuthOptions> ApplicationSettings
+
 <MudNavMenu>
     <MudNavLink Href="/" Match="NavLinkMatch.All" ForceLoad="true">Dashboard</MudNavLink>
     @if (AuthenticationStateProvider.GetAuthenticationStateAsync().Result is { User.Identity.IsAuthenticated: true })
@@ -7,7 +11,7 @@
         <MudNavLink Href="/clienten" Match="NavLinkMatch.Prefix" ForceLoad="true">Cliënten</MudNavLink>
         <MudNavLink Href="/gemeentes" Match="NavLinkMatch.Prefix" ForceLoad="true">Gemeentes</MudNavLink>
         <MudNavLink Href="/werknemers" Match="NavLinkMatch.Prefix" ForceLoad="true">Werknemers</MudNavLink>
+        <MudNavLink Href="@($"/panel?id={ApplicationSettings.Value.PanelId}")" Match="NavLinkMatch.Prefix" ForceLoad="true">Scherm Overview</MudNavLink>
     }
-    <MudNavLink Href="/panel" Match="NavLinkMatch.Prefix" ForceLoad="true">Scherm Overview</MudNavLink>
 </MudNavMenu>
 

@@ -1,7 +1,8 @@
 ﻿namespace OCWebOverview.Services
 {
-    public class AuthMessageSenderOptions
+    public class AuthOptions
     {
         public string? SendGridKey { get; set; }
+        public string? PanelId { get; set; }
     }
 }

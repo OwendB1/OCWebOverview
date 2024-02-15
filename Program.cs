@@ -62,7 +62,7 @@ var connectionBuilder = new PostgreSqlConnectionStringBuilder(builder.Environmen
 };
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
-builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+builder.Services.Configure<AuthOptions>(builder.Configuration);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionBuilder.ConnectionString), ServiceLifetime.Singleton);
