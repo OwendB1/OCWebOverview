@@ -29,9 +29,24 @@ builder.Services.AddAuthentication(options =>
     options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
 }).AddIdentityCookies();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
+
+if (builder.Environment.IsProduction())
+{
+    var connectionBuilder = new PostgreSqlConnectionStringBuilder(builder.Configuration["DATABASE_URL"] ?? throw new InvalidOperationException("Connection string 'DATABASE_URL' not found.")) 
+    {
+        Pooling = true,
+        TrustServerCertificate = true,
+        SslMode = SslMode.Require
+    };
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseNpgsql(connectionBuilder.ConnectionString), ServiceLifetime.Singleton);
+}
+else
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
+}
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
