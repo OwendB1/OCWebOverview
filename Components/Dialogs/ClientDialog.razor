@@ -10,32 +10,32 @@
         <DialogContent>
             <MudGrid>
                 <MudItem xs="3">
-                    <MudTextField @bind-Value="Client.Initialen" Label="Initialen" For="() => Client.Initialen"/>
+                    <MudTextField @bind-Value="Client.Initialen" Label="Initialen" For="() => Client.Initialen" ReadOnly="ReadOnly" />
                 </MudItem>
                 <MudItem xs="9">
-                    <MudTextField @bind-Value="Client.Achternaam" Label="Achternaam" For="() => Client.Achternaam"/>
+                    <MudTextField @bind-Value="Client.Achternaam" Label="Achternaam" For="() => Client.Achternaam" ReadOnly="ReadOnly" />
                 </MudItem>
             </MudGrid>
-            <MudDatePicker @bind-Value="Client.StartDatum" Date="Client.StartDatum" Label="Start Datum" Required="true" />
-            <MudDatePicker @bind-Value="Client.StartDatum" Date="Client.EindDatum" Label="Eind Datum" Required="true" />
-            <MudNumericField @bind-Value="Client.ZorgUren" Label="Aantal Zorg Uren" For="() => Client.ZorgUren"/>
-            <MudSelect @bind-Value="Client.HoofdWerknemerId" Label="Hoofd Werknemer" For="() => Client.HoofdWerknemerId">
+            <MudDatePicker @bind-Value="Client.StartDatum" Date="Client.StartDatum" Label="Start Datum" Required="true" ReadOnly="ReadOnly" />
+            <MudDatePicker @bind-Value="Client.StartDatum" Date="Client.EindDatum" Label="Eind Datum" Required="true" ReadOnly="ReadOnly" />
+            <MudNumericField @bind-Value="Client.ZorgUren" Label="Aantal Zorg Uren" For="() => Client.ZorgUren" ReadOnly="ReadOnly" />
+            <MudSelect @bind-Value="Client.HoofdWerknemerId" Label="Hoofd Werknemer" For="() => Client.HoofdWerknemerId" ReadOnly="ReadOnly">
                 @foreach (var werknemer in WerknemerCollection.GetAllWerknemers().Where(w => w.IsActiveInOverview))
                 {
                     <MudSelectItem Value="werknemer.Id">@werknemer.Initialen @werknemer.Achternaam</MudSelectItem>
                 }
             </MudSelect>
-            <MudSelect T="Guid" @bind-SelectedValues="Extras" MultiSelection="true" Label="Ondersteunende Werknemers">
+            <MudSelect T="Guid" @bind-SelectedValues="Extras" MultiSelection="true" Label="Ondersteunende Werknemers" ReadOnly="ReadOnly">
                 @foreach (var werknemer in WerknemerCollection.GetAllWerknemers().Where(w => w.IsActiveInOverview))
                 {
                     <MudSelectItem Value="werknemer.Id">@werknemer.Initialen @werknemer.Achternaam</MudSelectItem>
                 }
             </MudSelect>
-            <MudSelect @bind-Value="Client.ZorgType" Label="Zorg Type" For="() => Client.ZorgType">
+            <MudSelect @bind-Value="Client.ZorgType" Label="Zorg Type" For="() => Client.ZorgType" ReadOnly="ReadOnly">
                 <MudSelectItem Value="ZorgType.Jeugd"/>
                 <MudSelectItem Value="ZorgType.WMO"/>
             </MudSelect>
-            <MudSelect @bind-Value="Client.GemeenteId" Label="Gemeente" For="() => Client.GemeenteId">
+            <MudSelect @bind-Value="Client.GemeenteId" Label="Gemeente" For="() => Client.GemeenteId" ReadOnly="ReadOnly">
                 @foreach (var gemeente in GemeenteCollection.GetAllGemeentes())
                 {
                     <MudSelectItem Value="gemeente.Id">@gemeente.Naam</MudSelectItem>
@@ -44,18 +44,25 @@
             <MudText Typo="Typo.h6">Adres</MudText>
             <MudGrid>
                 <MudItem xs="9">
-                    <MudTextField @bind-Value="Client.Adres.Straat" Label="Straat" For="() => Client.Adres.Straat" />
+                    <MudTextField @bind-Value="Client.Adres.Straat" Label="Straat" For="() => Client.Adres.Straat" ReadOnly="ReadOnly" />
                 </MudItem>
                 <MudItem xs="3">
-                    <MudTextField @bind-Value="Client.Adres.HuisNummer" Label="Huisnummer" For="() => Client.Adres.HuisNummer" />
+                    <MudTextField @bind-Value="Client.Adres.HuisNummer" Label="Huisnummer" For="() => Client.Adres.HuisNummer" ReadOnly="ReadOnly" />
                 </MudItem>
             </MudGrid>
-            <MudTextField @bind-Value="Client.Adres.Postcode" Label="Postcode" For="() => Client.Adres.Postcode" />
-            <MudTextField @bind-Value="Client.Adres.Plaats" Label="Plaats" For="() => Client.Adres.Plaats" />
+            <MudTextField @bind-Value="Client.Adres.Postcode" Label="Postcode" For="() => Client.Adres.Postcode" ReadOnly="ReadOnly" />
+            <MudTextField @bind-Value="Client.Adres.Plaats" Label="Plaats" For="() => Client.Adres.Plaats" ReadOnly="ReadOnly" />
         </DialogContent>
         <DialogActions>
-            <MudButton OnClick="Cancel">Cancel</MudButton>
-            <MudButton ButtonType="ButtonType.Submit">@ButtonText</MudButton>
+            @if (ReadOnly)
+            {
+                <MudButton OnClick="Cancel">Close</MudButton>
+            }
+            else
+            {
+                <MudButton OnClick="Cancel">Cancel</MudButton>
+                <MudButton ButtonType="ButtonType.Submit">@ButtonText</MudButton>
+            }
         </DialogActions>
     </MudDialog>
 </EditForm>
@@ -64,6 +71,7 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Client Client { get; set; }
     [Parameter] public string ButtonText { get; set; }
+    [Parameter] public bool ReadOnly { get; set; }
     private IEnumerable<Guid> Extras { get; set; } = new HashSet<Guid>();
 
     private void Cancel()

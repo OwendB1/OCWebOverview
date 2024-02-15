@@ -70,7 +70,8 @@
         var parameters = new DialogParameters
         {
             { "Client", new Client("", "", DateTime.Today, DateTime.Today, 0, Guid.Empty, new List<Guid>(), ZorgType.Jeugd, Guid.Empty, new Adres("", "", "", "")) },
-            { "ButtonText", "Toevoegen" }
+            { "ButtonText", "Toevoegen" },
+            { "ReadOnly", false }
         };
         var dialog = await DialogService.ShowAsync<ClientDialog>("Nieuwe Cliënt Toevoegen", parameters);
         var result = await dialog.Result;
@@ -88,7 +89,8 @@
         var parameters = new DialogParameters
         {
             { "Client", item },
-            { "ButtonText", "Aanpassen" }
+            { "ButtonText", "Aanpassen" },
+            { "ReadOnly", false }
         };
         var dialog = await DialogService.ShowAsync<ClientDialog>("Bestaande Cliënt Aanpassen", parameters);
         var result = await dialog.Result;

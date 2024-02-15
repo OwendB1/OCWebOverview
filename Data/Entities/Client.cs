@@ -12,12 +12,21 @@ namespace OCWebOverview.Data.Entities
 
         [Required(ErrorMessage = "Dit veld is benodigd.")]
         public string Achternaam { get; set; }
-
+        
         [Required]
-        public DateTime StartDatum { get; set; }
-
+        public DateTime StartDatum {
+            get => _startDatum;
+            set => _startDatum = value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime();
+        }
+        private DateTime _startDatum;
+        
         [Required]
-        public DateTime EindDatum { get; set; }
+        public DateTime EindDatum
+        {
+            get => _eindDatum;
+            set => _eindDatum = value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime();
+        }
+        private DateTime _eindDatum;
 
         [Required(ErrorMessage = "Dit veld is benodigd.")]
         [Range(1, int.MaxValue, ErrorMessage = "Aantal uren moet minstens 1 zijn.")]

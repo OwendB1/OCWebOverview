@@ -3,12 +3,14 @@
 @using OCWebOverview.Data.Entities
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.Extensions.Options
+@using OCWebOverview.Components.Dialogs
 @using OCWebOverview.Services
 @inject NavigationManager NavigationManager
 @inject ClientCollection ClientCollection
 @inject GemeenteCollection GemeenteCollection
 @inject WerknemerCollection WerknemerCollection
 @inject IOptions<AuthOptions> ApplicationSettings
+@inject IDialogService DialogService
 
 @if (_id != ApplicationSettings.Value.PanelId)
 {
@@ -20,32 +22,29 @@ else
         @foreach (var werknemer in Werknemers)
         {
             var clientsPerWerknemer = Clients.Where(c => c.HoofdWerknemerId == werknemer.Id);
-            <MudPaper Class="ma-1" MinWidth="350px" Style="display: flex; flex-direction: column;">
+            <MudPaper Class="ma-1" MinWidth="350px" Style="display: flex; flex-direction: column">
                 <div class="pa-3 d-inline-flex align-items-center">
                     <MudText Typo="Typo.h6">@werknemer.Initialen @werknemer.Achternaam</MudText>
                     <MudIcon Size="Size.Medium" Icon="@Icons.Material.Rounded.Square" Style="@($"color:{werknemer.ColorHexCode};")"/>
                 </div>
-                <MudSimpleTable Class="pt-1" Elevation="0" Style="overflow-y: auto" FixedHeader="true" Dense="true">
-                    <thead>
-                    <tr>
-                        <th>Cliënten</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+                <div Class="mud-grid d-inline-flex x-overflow-auto">
                     @foreach (var client in clientsPerWerknemer)
                     {
-                        <tr>
-                            <td>
-                                <div class="d-inline-flex align-items-center" style="white-space: nowrap;">
-                                    <MudText Typo="Typo.body1">@client.Initialen @client.Achternaam | Type: @client.ZorgType | Uren: @client.ZorgUren | </MudText>
-                                    <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Dark"/>
-                                    <MudText Typo="Typo.body1">@client.ExtraWerknemerIds.Count</MudText>
-                                </div>
-                            </td>
-                        </tr>
+                        <MudItem Class="pa-1" xs="6">
+                            <MudPaper Class="pa-1" Elevation="4" Outlined="true">
+                                <MudLink OnClick="() => Show(client)" Underline="Underline.None">
+                                    <MudText Typo="Typo.body1">@client.Initialen @client.Achternaam</MudText>
+                                    <MudText Typo="Typo.body1">Type: @client.ZorgType</MudText>
+                                    <MudText Typo="Typo.body1">Uren: @client.ZorgUren</MudText>
+                                    <div class="d-inline-flex align-items-center">
+                                        <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Dark"/>
+                                        <MudText Typo="Typo.body1">@client.ExtraWerknemerIds.Count</MudText>
+                                    </div>
+                                </MudLink>
+                            </MudPaper>
+                        </MudItem>
                     }
-                    </tbody>
-                </MudSimpleTable>
+                </div>
             </MudPaper>
         }
     </div>
@@ -77,5 +76,16 @@ else
     private async void StateChange(object? sender, EventArgs e)
     {
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void Show(Client item)
+    {
+        var parameters = new DialogParameters
+        {
+            { "Client", item },
+            { "ButtonText", "Niks" },
+            { "ReadOnly", true }
+        };
+        DialogService.Show<ClientDialog>("Bestaande Cliënt Inzien", parameters);
     }
 }
