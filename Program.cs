@@ -95,5 +95,4 @@ app.MapRazorComponents<App>()
 app.MapAdditionalIdentityEndpoints();
 
 app.UseRouting();
-app.UseAntiforgery();
 app.Run();
