@@ -9,16 +9,12 @@
 {
     <MudLayout>
         <MudAppBar Elevation="0">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-            <MudSpacer />
-            <LoginDisplay />
-        </MudAppBar>
-        <MudDrawer @bind-Open="@_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1">
-            <MudDrawerHeader>
-                <MudText Typo="Typo.h6">Omnis Cura</MudText>
-            </MudDrawerHeader>
+            <img src="oclogo.png" height="50" />
             <NavMenu />
-        </MudDrawer>
+            <MudSpacer/>
+            <LoginDisplay/>
+        </MudAppBar>
+        
         <MudMainContent>
             <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="pa-2; overflow-x-scroll;">
                 @Body
@@ -38,13 +34,6 @@ else
 </div>
 
 @code {
-    bool _drawerOpen;
-
-    void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
-
     MudTheme _omnisCuraTheme = new ()
     {
         Palette = new PaletteLight()

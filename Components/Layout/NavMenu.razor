@@ -4,14 +4,24 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IOptions<AuthOptions> ApplicationSettings
 
-<MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All" ForceLoad="true">Dashboard</MudNavLink>
-    @if (AuthenticationStateProvider.GetAuthenticationStateAsync().Result is { User.Identity.IsAuthenticated: true })
-    {
-        <MudNavLink Href="/clienten" Match="NavLinkMatch.Prefix" ForceLoad="true">Cliënten</MudNavLink>
-        <MudNavLink Href="/gemeentes" Match="NavLinkMatch.Prefix" ForceLoad="true">Gemeentes</MudNavLink>
-        <MudNavLink Href="/werknemers" Match="NavLinkMatch.Prefix" ForceLoad="true">Werknemers</MudNavLink>
-        <MudNavLink Href="@($"/panel?id={ApplicationSettings.Value.PanelId}")" Match="NavLinkMatch.Prefix" ForceLoad="true">Scherm Overview</MudNavLink>
-    }
-</MudNavMenu>
+
+<NavLink class="nav-link" href="/" style="color: white">
+    <span style="margin-left: 20px; font-size: medium">Home</span>
+</NavLink>
+@if (AuthenticationStateProvider.GetAuthenticationStateAsync().Result is { User.Identity.IsAuthenticated: true })
+{
+    <NavLink class="nav-link" href="clienten" style="color: white">
+        <span style="margin-left: 20px; font-size: medium">Cliënten</span>
+    </NavLink>
+    <NavLink class="nav-link" href="gemeentes" style="color: white">
+        <span style="margin-left: 20px; font-size: medium">Gemeentes</span>
+    </NavLink>
+    <NavLink class="nav-link" href="werknemers" style="color: white">
+        <span style="margin-left: 20px; font-size: medium">Werknemers</span>
+    </NavLink>
+    <NavLink class="nav-link" href="@($"/panel?id={ApplicationSettings.Value.PanelId}")" style="color: white">
+        <span style="margin-left: 20px; font-size: medium">Scherm Overview</span>
+    </NavLink>
+}
+
 
