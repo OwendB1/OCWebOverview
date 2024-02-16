@@ -37,7 +37,7 @@
         <MudTd DataLabel="Eind Datum">@context.EindDatum.ToShortDateString()</MudTd>
         <MudTd DataLabel="Zorg Uren">@context.ZorgUren</MudTd>
         <MudTd DataLabel="Zorg Type">@context.ZorgType</MudTd>
-            <MudTd DataLabel="Hoofd Werknemer">@Werknemers.First(w => w.Id == context.HoofdWerknemerId).Initialen @Werknemers.First(w => w.Id == context.HoofdWerknemerId).Achternaam</MudTd>
+            <MudTd DataLabel="Hoofd Werknemer">@Werknemers.First(w => w.Id == context.HoofdWerknemerId).Naam</MudTd>
         <MudTd DataLabel="PC & Hnmr">@context.Adres.Postcode, @context.Adres.HuisNummer</MudTd>
         <MudTd DataLabel="Gemeente">@Gemeentes.First(g => g.Id == context.GemeenteId).Naam</MudTd>
         <MudTd DataLabel="Buttons">

@@ -283,23 +283,22 @@ namespace OCWebOverview.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Achternaam")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("ColorHexCode")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Initialen")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsActiveInOverview")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Naam")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("StartDatum")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UrenPerWeek")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

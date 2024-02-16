@@ -30,7 +30,8 @@ namespace OCWebOverview.Data.Collections
             if (entry is null) return false;
             entry.ColorHexCode = w.ColorHexCode;
             entry.IsActiveInOverview = w.IsActiveInOverview;
-            entry.Initialen = w.Initialen;
+            entry.Naam = w.Naam;
+            entry.UrenPerWeek = w.UrenPerWeek;
             DataHasChanged();
             return dbContext.SaveChanges() > 0;
         }

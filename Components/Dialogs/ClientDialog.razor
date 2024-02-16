@@ -22,13 +22,13 @@
             <MudSelect @bind-Value="Client.HoofdWerknemerId" Label="Hoofd Werknemer" For="() => Client.HoofdWerknemerId" ReadOnly="ReadOnly">
                 @foreach (var werknemer in WerknemerCollection.GetAllWerknemers().Where(w => w.IsActiveInOverview))
                 {
-                    <MudSelectItem Value="werknemer.Id">@werknemer.Initialen @werknemer.Achternaam</MudSelectItem>
+                    <MudSelectItem Value="werknemer.Id">@werknemer.Naam</MudSelectItem>
                 }
             </MudSelect>
             <MudSelect T="Guid" @bind-SelectedValues="Extras" MultiSelection="true" Label="Ondersteunende Werknemers" ReadOnly="ReadOnly">
                 @foreach (var werknemer in WerknemerCollection.GetAllWerknemers().Where(w => w.IsActiveInOverview))
                 {
-                    <MudSelectItem Value="werknemer.Id">@werknemer.Initialen @werknemer.Achternaam</MudSelectItem>
+                    <MudSelectItem Value="werknemer.Id">@werknemer.Naam</MudSelectItem>
                 }
             </MudSelect>
             <MudSelect @bind-Value="Client.ZorgType" Label="Zorg Type" For="() => Client.ZorgType" ReadOnly="ReadOnly">

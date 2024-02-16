@@ -22,15 +22,17 @@
         <MudTh>Naam</MudTh>
         <MudTh>Kleur</MudTh>
         <MudTh>Start Datum</MudTh>
+        <MudTh>Aantal Uren Per Week</MudTh>
         <MudTh>Actief?</MudTh>
         <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Naam">@context.Initialen @context.Achternaam</MudTd>
+        <MudTd DataLabel="Naam">@context.Naam</MudTd>
         <MudTd DataLabel="Kleur">
                 <MudIcon Size="Size.Medium" Icon="@Icons.Material.Rounded.Square" Style="@($"color:{context.ColorHexCode};")" />
         </MudTd>
-            <MudTd DataLabel="Start Datum">@context.StartDatum.ToShortDateString()</MudTd>
+        <MudTd DataLabel="Start Datum">@context.StartDatum.ToShortDateString()</MudTd>
+        <MudTd DataLabel="Uren">@context.UrenPerWeek</MudTd>
         <MudTd DataLabel="Actief">
             <MudCheckBox @bind-Value="context.IsActiveInOverview" ReadOnly="true"/>
         </MudTd>
@@ -59,7 +61,7 @@
     {
         var parameters = new DialogParameters
         {
-            { "Werknemer", new Werknemer("", "", DateTime.Today, "", true) },
+            { "Werknemer", new Werknemer("", DateTime.Today, 0,"", true) },
             { "ButtonText", "Toevoegen" }
         };
         var dialog = await DialogService.ShowAsync<WerknemerDialog>("Nieuwe Werknemer Toevoegen", parameters);
@@ -102,7 +104,7 @@
     private bool FilterFunc(Werknemer element)
     {
         if (string.IsNullOrWhiteSpace(searchString)) return true;
-        if (element.Achternaam.Contains(searchString)) return true;
+        if (element.Naam.Contains(searchString)) return true;
         return element.StartDatum.Date.ToShortDateString().Contains(searchString);
     }
 }

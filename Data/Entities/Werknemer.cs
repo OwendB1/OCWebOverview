@@ -8,9 +8,10 @@ namespace OCWebOverview.Data.Entities
         [Key]
         public Guid Id { get; set; }
         [Required(ErrorMessage = "Dit veld is benodigd.")]
-        public string Initialen { get; set; }
+        public string Naam { get; set; }
         [Required(ErrorMessage = "Dit veld is benodigd.")]
-        public string Achternaam { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Aantal uren moet minstens 1 zijn.")]
+        public int UrenPerWeek { get; set; }
 
         [Required]
         public DateTime StartDatum
@@ -26,11 +27,11 @@ namespace OCWebOverview.Data.Entities
         public bool IsActiveInOverview { get; set; }
         #endregion
 
-        public Werknemer(string initialen, string achternaam, DateTime startDatum, string colorHexCode, bool isActiveInOverview, Guid? id = null)
+        public Werknemer(string naam, DateTime startDatum, int urenPerWeek, string colorHexCode, bool isActiveInOverview, Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
-            Initialen = initialen;
-            Achternaam = achternaam;
+            Naam = naam;
+            UrenPerWeek = urenPerWeek;
             StartDatum = startDatum;
             ColorHexCode = colorHexCode;
             IsActiveInOverview = isActiveInOverview;

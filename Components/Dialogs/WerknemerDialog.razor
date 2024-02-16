@@ -6,10 +6,10 @@
             <DataAnnotationsValidator/>
             <MudGrid>
                 <MudItem xs="3">
-                    <MudTextField @bind-Value="Werknemer.Initialen" Label="Initialen"/>
+                    <MudTextField @bind-Value="Werknemer.Naam" Label="Naam"/>
                 </MudItem>
                 <MudItem xs="9">
-                    <MudTextField @bind-Value="Werknemer.Achternaam" Label="Achternaam"/>
+                    <MudNumericField @bind-Value="Werknemer.UrenPerWeek" Label="Uren Per Week"/>
                 </MudItem>
             </MudGrid>
             <MudDatePicker @bind-Value="Werknemer.StartDatum" Date="Werknemer.StartDatum" Label="Start Datum" />
