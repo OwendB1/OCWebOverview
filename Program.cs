@@ -12,6 +12,7 @@ using OCWebOverview.Data.Database;
 using OCWebOverview.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
