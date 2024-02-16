@@ -22,10 +22,10 @@
 }
 else
 {
-    <div class="d-inline-flex pa-2" style="height: 98.8vh">
+    <div class="d-inline-flex pa-2" style="height: 93vh">
         @foreach (var werknemer in Werknemers)
         {
-            var clientsPerWerknemer = Clients.Where(c => c.HoofdWerknemerId == werknemer.Id);
+            var clientsPerWerknemer = Clients.Where(c => c.HoofdWerknemerId == werknemer.Id).ToList();
             <MudPaper Class="ma-1" MinWidth="300px" Style="display: flex; flex-direction: column">
                 <div class="pa-3 d-inline-flex align-items-center">
                     <MudText Typo="Typo.h6">@werknemer.Naam</MudText>
@@ -40,17 +40,19 @@ else
                                 <MudLink OnClick="() => Show(client)" Underline="Underline.None">
                                     <MudText Typo="Typo.body2">@client.Initialen @client.Achternaam</MudText>
                                     <MudText Typo="Typo.body2">Uren: @client.ZorgUren</MudText>
-                                    <MudText Typo="Typo.body2">Datum: <br/> @client.StartDatum.ToShortDateString() @client.EindDatum.ToShortDateString()</MudText>
+                                    <MudText Typo="Typo.body2">Start: @client.StartDatum.ToShortDateString()</MudText>
+                                    <MudText Typo="Typo.body2">Eind: @client.EindDatum.ToShortDateString()</MudText>
                                     <MudText Typo="Typo.body2">@client.ZorgType</MudText>
                                     <div class="d-inline-flex align-items-center">
                                         <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Dark"/>
-                                            <MudText Typo="Typo.body2">@client.ExtraWerknemerIds.Count</MudText>
+                                        <MudText Typo="Typo.body2">@client.ExtraWerknemerIds.Count</MudText>
                                     </div>
                                 </MudLink>
                             </MudPaper>
                         </MudItem>
                     }
                 </div>
+                <MudText Class="pa-2" Typo="Typo.body2">Totaal: @clientsPerWerknemer.Select(c => c.ZorgUren).Sum()</MudText>
             </MudPaper>
         }
     </div>
