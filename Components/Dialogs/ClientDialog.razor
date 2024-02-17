@@ -18,19 +18,32 @@
             </MudGrid>
             <MudDatePicker @bind-Value="Client.StartDatum" Date="Client.StartDatum" Label="Start Datum" Required="true" ReadOnly="ReadOnly" />
             <MudDatePicker @bind-Value="Client.StartDatum" Date="Client.EindDatum" Label="Eind Datum" Required="true" ReadOnly="ReadOnly" />
-            <MudNumericField @bind-Value="Client.ZorgUren" Label="Aantal Zorg Uren" For="() => Client.ZorgUren" ReadOnly="ReadOnly" />
-            <MudSelect @bind-Value="Client.HoofdWerknemerId" Label="Hoofd Werknemer" For="() => Client.HoofdWerknemerId" ReadOnly="ReadOnly">
-                @foreach (var werknemer in WerknemerCollection.GetAllWerknemers().Where(w => w.IsActiveInOverview))
-                {
-                    <MudSelectItem Value="werknemer.Id">@werknemer.Naam</MudSelectItem>
-                }
-            </MudSelect>
-            <MudSelect T="Guid" @bind-SelectedValues="Extras" MultiSelection="true" Label="Ondersteunende Werknemers" ReadOnly="ReadOnly">
-                @foreach (var werknemer in WerknemerCollection.GetAllWerknemers().Where(w => w.IsActiveInOverview))
-                {
-                    <MudSelectItem Value="werknemer.Id">@werknemer.Naam</MudSelectItem>
-                }
-            </MudSelect>
+            <MudGrid>
+                <MudItem xs="9">
+                    <MudSelect @bind-Value="Client.HoofdWerknemerId" Label="Hoofd Werknemer" For="() => Client.HoofdWerknemerId" ReadOnly="ReadOnly">
+                        @foreach (var werknemer in _werknemers)
+                        {
+                            <MudSelectItem Value="werknemer.Id">@werknemer.Naam</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="3">
+                    <MudNumericField @bind-Value="Client.ZorgUrenHoofd" Label="Zorg Uren" For="() => Client.ZorgUrenHoofd" ReadOnly="ReadOnly" />
+                </MudItem>
+            </MudGrid>
+           <MudGrid>
+                <MudItem xs="9">
+                    <MudSelect T="Guid?" @bind-Select="Client.ExtraWerknemerId" Label="Ondersteunende Werknemer" Clearable="true" ReadOnly="ReadOnly">
+                        @foreach (var werknemer in _werknemers)
+                        {
+                            <MudSelectItem Value="(Guid?)werknemer.Id">@werknemer.Naam</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="3">
+                    <MudNumericField @bind-Value="Client.ZorgUrenExtra" Label="Zorg Uren" ReadOnly="ReadOnly" />
+                </MudItem>
+            </MudGrid>
             <MudSelect @bind-Value="Client.ZorgType" Label="Zorg Type" For="() => Client.ZorgType" ReadOnly="ReadOnly">
                 <MudSelectItem Value="ZorgType.Jeugd"/>
                 <MudSelectItem Value="ZorgType.WMO"/>
@@ -73,6 +86,12 @@
     [Parameter] public string ButtonText { get; set; }
     [Parameter] public bool ReadOnly { get; set; }
     private IEnumerable<Guid> Extras { get; set; } = new HashSet<Guid>();
+    private List<Werknemer> _werknemers;
+
+    protected override void OnInitialized()
+    {
+        _werknemers = WerknemerCollection.GetAllWerknemers().Where(w => w.IsActiveInOverview).ToList();
+    }
 
     private void Cancel()
     {
@@ -81,12 +100,11 @@
 
     private void Submit()
     {
-        if (Client.ExtraWerknemerIds.Contains(Client.HoofdWerknemerId))
+        if (Client.HoofdWerknemerId == Client.ExtraWerknemerId)
         {
-            Snackbar.Add("Het is niet toegestaan om de hoofdwerknemer ook nog eens in de lijst van ondersteunende werknemers te zetten.", Severity.Error);
+            Snackbar.Add("Hoofd werknemer en ondersteunende werknemer kunnen niet hetzelfde zijn.", Severity.Error);
             return;
         }
-        Client.ExtraWerknemerIds = Extras.ToList();
         MudDialog.Close(DialogResult.Ok(Client));
     }
 }

@@ -1,9 +1,9 @@
 ﻿@page "/werknemers"
-@using Microsoft.AspNetCore.Authorization
 @using OCWebOverview.Components.Dialogs
 @using OCWebOverview.Data.Collections
 @using OCWebOverview.Data.Entities
 @attribute [Authorize]
+@inject ILocalStorageService Storage
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject WerknemerCollection WerknemerCollection
@@ -12,18 +12,18 @@
 
 <MudButton Class="mb-2" Variant="Variant.Filled" OnClick="Create">Voeg nieuwe Werknemer toe</MudButton>
 
-<MudTable Items="@Werknemers" Dense="false" Hover="true" Bordered="false" Striped="false" Filter="new Func<Werknemer,bool>(FilterFunc)">
+<MudTable Items="@Werknemers" Dense="true" Hover="true" Bordered="false" Striped="false" Filter="new Func<Werknemer,bool>(FilterFunc)" RowsPerPage="_rowsPerPage" RowsPerPageChanged="async val => await SetRows(val)">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Werknemers</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>Naam</MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Werknemer, object>(x=>x.Naam)">Naam</MudTableSortLabel></MudTh>
         <MudTh>Kleur</MudTh>
-        <MudTh>Start Datum</MudTh>
-        <MudTh>Aantal Uren Per Week</MudTh>
-        <MudTh>Actief?</MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Werknemer, object>(x=>x.StartDatum)">Start Datum</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Werknemer, object>(x=>x.UrenPerWeek)">Aantal Uren Per Week</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Werknemer, object>(x=>x.IsActiveInOverview)">Actief?</MudTableSortLabel></MudTh>
         <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -44,17 +44,25 @@
         </MudTd>
     </RowTemplate>
     <PagerContent>
-        <MudTablePager />
+        <MudTablePager PageSizeOptions="new[] { 10, 25, 50, 100, int.MaxValue }" />
     </PagerContent>
 </MudTable>
 
-    @code {
+@code {
     private IEnumerable<Werknemer> Werknemers;
     private string searchString = "";
+    private int _rowsPerPage = 10;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         Werknemers = WerknemerCollection.GetAllWerknemers();
+        _rowsPerPage = await Storage.GetItemAsync<int>("WerknemerPanelPagination");
+    }
+
+    private async Task SetRows(int val)
+    {
+        _rowsPerPage = val;
+        await Storage.SetItemAsync("WerknemerPanelPagination", val);
     }
 
     private async Task Create()

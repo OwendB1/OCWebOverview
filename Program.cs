@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -43,9 +44,9 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-builder.Services.AddSingleton<ClientCollection>();
-builder.Services.AddSingleton<GemeenteCollection>();
-builder.Services.AddSingleton<WerknemerCollection>();
+builder.Services.AddScoped<ClientCollection>();
+builder.Services.AddScoped<GemeenteCollection>();
+builder.Services.AddScoped<WerknemerCollection>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -66,7 +67,7 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.Configure<AuthOptions>(builder.Configuration);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionBuilder.ConnectionString), ServiceLifetime.Singleton);
+    options.UseNpgsql(connectionBuilder.ConnectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -74,6 +75,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
+builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();

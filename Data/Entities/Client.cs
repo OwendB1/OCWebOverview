@@ -30,12 +30,14 @@ namespace OCWebOverview.Data.Entities
 
         [Required(ErrorMessage = "Dit veld is benodigd.")]
         [Range(1, int.MaxValue, ErrorMessage = "Aantal uren moet minstens 1 zijn.")]
-        public int ZorgUren { get; set; }
+        public int ZorgUrenHoofd { get; set; }
+
+        public int ZorgUrenExtra { get; set; }
 
         [Required(ErrorMessage = "Dit veld is benodigd.")]
         public Guid HoofdWerknemerId { get; set; }
 
-        public List<Guid> ExtraWerknemerIds { get; set; }
+        public Guid? ExtraWerknemerId { get; set; }
 
         [Required(ErrorMessage = "Dit veld is benodigd.")]
         public ZorgType ZorgType { get; set; }
@@ -49,16 +51,17 @@ namespace OCWebOverview.Data.Entities
         public virtual Gemeente Gemeente { get; set; }
         #endregion
 
-        public Client(string initialen, string achternaam, DateTime startDatum, DateTime eindDatum, int zorgUren, Guid hoofdWerknemerId, List<Guid> extraWerknemerIds, ZorgType zorgType, Guid gemeenteId, Adres adres, Guid? id = null)
+        public Client(string initialen, string achternaam, DateTime startDatum, DateTime eindDatum, int zorgUrenHoofd, int zorgUrenExtra, Guid hoofdWerknemerId, Guid? extraWerknemerId, ZorgType zorgType, Guid gemeenteId, Adres adres, Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
             Initialen = initialen;
             Achternaam = achternaam;
             StartDatum = startDatum;
             EindDatum = eindDatum;
-            ZorgUren = zorgUren;
+            ZorgUrenHoofd = zorgUrenHoofd;
+            ZorgUrenExtra = zorgUrenExtra;
             HoofdWerknemerId = hoofdWerknemerId;
-            ExtraWerknemerIds = extraWerknemerIds;
+            ExtraWerknemerId = extraWerknemerId;
             ZorgType = zorgType;
             GemeenteId = gemeenteId;
             Adres = adres;

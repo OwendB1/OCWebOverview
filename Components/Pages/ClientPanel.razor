@@ -1,9 +1,10 @@
 ﻿@page "/clienten"
-@using Microsoft.AspNetCore.Authorization
+@using Microsoft.IdentityModel.Tokens
 @using OCWebOverview.Components.Dialogs
 @using OCWebOverview.Data.Collections
 @using OCWebOverview.Data.Entities
 @attribute [Authorize]
+@inject ILocalStorageService Storage
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject ClientCollection ClientCollection
@@ -14,31 +15,31 @@
 
 <MudButton Class="mb-2" Variant="Variant.Filled" OnClick="Create">Voeg nieuwe Cliënt toe</MudButton>
 
-<MudTable Items="@Clients" Dense="false" Hover="true" Bordered="false" Striped="false" Filter="new Func<Client,bool>(FilterFunc)">
+<MudTable Items="@Clients" Dense="true" Hover="true" Bordered="false" Striped="false" Filter="new Func<Client,bool>(FilterFunc)" RowsPerPage="@_rowsPerPage" RowsPerPageChanged="async (val) => await SetRows(val)">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Cliënten</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>Naam</MudTh>
-        <MudTh>Start Datum</MudTh>
-        <MudTh>Eind Datum</MudTh>
-        <MudTh>Zorg Uren</MudTh>
-        <MudTh>Zorg Type</MudTh>
-        <MudTh>Hoofd werknemer</MudTh>
-        <MudTh>Postcode & Huisnummer</MudTh>
-        <MudTh>Gemeente</MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>x.Achternaam)">Naam</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>x.StartDatum)">Start Datum</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>x.EindDatum)">Eind Datum</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>x.ZorgUrenHoofd + x.ZorgUrenExtra)">Zorg Uren Totaal</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>x.ZorgType)">Zorg Type</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>Werknemers.First(y => y.Id == x.HoofdWerknemerId).Naam)">Hoofd werknemer</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>x.Adres.Postcode)">Postcode & Huisnummer</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>x.Gemeente.Naam)">Gemeente</MudTableSortLabel></MudTh>
         <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Naam">@context.Initialen @context.Achternaam</MudTd>
         <MudTd DataLabel="Start Datum">@context.StartDatum.ToShortDateString()</MudTd>
         <MudTd DataLabel="Eind Datum">@context.EindDatum.ToShortDateString()</MudTd>
-        <MudTd DataLabel="Zorg Uren">@context.ZorgUren</MudTd>
+        <MudTd DataLabel="Zorg Uren">@(context.ZorgUrenHoofd + context.ZorgUrenExtra)</MudTd>
         <MudTd DataLabel="Zorg Type">@context.ZorgType</MudTd>
-            <MudTd DataLabel="Hoofd Werknemer">@Werknemers.First(w => w.Id == context.HoofdWerknemerId).Naam</MudTd>
-        <MudTd DataLabel="PC & Hnmr">@context.Adres.Postcode, @context.Adres.HuisNummer</MudTd>
+        <MudTd DataLabel="Hoofd Werknemer">@Werknemers.First(w => w.Id == context.HoofdWerknemerId).Naam</MudTd>
+        <MudTd DataLabel="PC & Hnmr">@(!context.Adres.Postcode.IsNullOrEmpty() ? $"{context.Adres.Postcode}, {context.Adres.HuisNummer}" : "Niet Ingevuld")</MudTd>
         <MudTd DataLabel="Gemeente">@Gemeentes.First(g => g.Id == context.GemeenteId).Naam</MudTd>
         <MudTd DataLabel="Buttons">
             <div class="d-inline-flex">
@@ -48,7 +49,7 @@
         </MudTd>
     </RowTemplate>
     <PagerContent>
-        <MudTablePager />
+        <MudTablePager PageSizeOptions="new[] { 10, 25, 50, 100, int.MaxValue }"/>
     </PagerContent>
 </MudTable>
 
@@ -56,20 +57,29 @@
     private IEnumerable<Client> Clients;
     private IEnumerable<Gemeente> Gemeentes;
     private IEnumerable<Werknemer> Werknemers;
-    private string searchString = "";
 
-    protected override void OnInitialized()
+    private string _searchString = "";
+    private int _rowsPerPage = 10;
+
+    protected override async Task OnInitializedAsync()
     {
         Clients = ClientCollection.GetAllClients();
         Gemeentes = GemeenteCollection.GetAllGemeentes();
         Werknemers = WerknemerCollection.GetAllWerknemers();
+        _rowsPerPage = await Storage.GetItemAsync<int>("ClientPanelPagination");
+    }
+
+    private async Task SetRows(int val)
+    {
+        _rowsPerPage = val;
+        await Storage.SetItemAsync("ClientPanelPagination", val);
     }
 
     private async Task Create()
     {
         var parameters = new DialogParameters
         {
-            { "Client", new Client("", "", DateTime.Today, DateTime.Today, 0, Guid.Empty, new List<Guid>(), ZorgType.Jeugd, Guid.Empty, new Adres("", "", "", "")) },
+            { "Client", new Client("", "", DateTime.Today, DateTime.Today, 0, 0, Guid.Empty, null, ZorgType.Jeugd, Guid.Empty, new Adres("", "", "", "")) },
             { "ButtonText", "Toevoegen" },
             { "ReadOnly", false }
         };
@@ -113,10 +123,10 @@
 
     private bool FilterFunc(Client element)
     {
-        if (string.IsNullOrWhiteSpace(searchString)) return true;
-        if (element.Achternaam.Contains(searchString)) return true;
-        if (element.Adres.Postcode.Contains(searchString)) return true;
-        if (element.StartDatum.Date.ToShortDateString().Contains(searchString)) return true;
-        return element.ZorgUren == int.Parse(searchString);
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+        if (element.Achternaam.Contains(_searchString)) return true;
+        if (element.Adres.Postcode.Contains(_searchString)) return true;
+        if (element.StartDatum.Date.ToShortDateString().Contains(_searchString)) return true;
+        return element.ZorgUrenHoofd + element.ZorgUrenExtra == int.Parse(_searchString);
     }
 }

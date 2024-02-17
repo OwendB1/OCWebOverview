@@ -33,11 +33,12 @@ namespace OCWebOverview.Data.Collections
             entry.GemeenteId = c.GemeenteId;
             entry.Adres = c.Adres;
             entry.HoofdWerknemerId = c.HoofdWerknemerId;
-            entry.ExtraWerknemerIds = c.ExtraWerknemerIds;
+            entry.ExtraWerknemerId = c.ExtraWerknemerId;
             entry.StartDatum = c.StartDatum;
             entry.EindDatum = c.EindDatum;
             entry.ZorgType = c.ZorgType;
-            entry.ZorgUren = c.ZorgUren;
+            entry.ZorgUrenHoofd = c.ZorgUrenHoofd;
+            entry.ZorgUrenExtra = c.ZorgUrenExtra;
             DataHasChanged();
             return dbContext.SaveChanges() > 0;
         }

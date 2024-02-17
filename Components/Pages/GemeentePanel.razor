@@ -1,9 +1,9 @@
 ﻿@page "/gemeentes"
-@using Microsoft.AspNetCore.Authorization
 @using OCWebOverview.Components.Dialogs
 @using OCWebOverview.Data.Collections
 @using OCWebOverview.Data.Entities
 @attribute [Authorize]
+@inject ILocalStorageService Storage
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject GemeenteCollection GemeenteCollection
@@ -12,14 +12,14 @@
 
 <MudButton Class="mb-2" Variant="Variant.Filled" OnClick="Create">Voeg nieuwe gemeente toe</MudButton>
 
-<MudTable Items="@Gemeentes" Dense="false" Hover="true" Bordered="false" Striped="false" Filter="new Func<Gemeente,bool>(FilterFunc)">
+<MudTable Items="@Gemeentes" Dense="true" Hover="true" Bordered="false" Striped="false" Filter="new Func<Gemeente,bool>(FilterFunc)" RowsPerPage="_rowsPerPage" RowsPerPageChanged="async val => await SetRows(val)">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Gemeentes</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>Naam</MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Gemeente, object>(x=>x.Naam)">Naam</MudTableSortLabel></MudTh>
         <MudTh>Kantoor Locatie</MudTh>
         <MudTh></MudTh>
     </HeaderContent>
@@ -34,17 +34,25 @@
         </MudTd>
     </RowTemplate>
     <PagerContent>
-        <MudTablePager />
+        <MudTablePager PageSizeOptions="new[] { 10, 25, 50, 100, int.MaxValue }" />
     </PagerContent>
 </MudTable>
 
-    @code {
+@code {
     private IEnumerable<Gemeente> Gemeentes;
     private string searchString = "";
+    private int _rowsPerPage = 10;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         Gemeentes = GemeenteCollection.GetAllGemeentes();
+        _rowsPerPage = await Storage.GetItemAsync<int>("GemeentePanelPagination");
+    }
+
+    private async Task SetRows(int val)
+    {
+        _rowsPerPage = val;
+        await Storage.SetItemAsync("GemeentePanelPagination", val);
     }
 
     private async Task Create()

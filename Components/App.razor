@@ -28,5 +28,5 @@
 
     private IComponentRenderMode? RenderModeForPage => HttpContext.Request.Path.StartsWithSegments("/Account")
         ? null
-        : InteractiveServer;
+        : new InteractiveServerRenderMode(false);
 }

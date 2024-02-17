@@ -8,7 +8,7 @@ namespace OCWebOverview.Data.Database
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-            Database.Migrate();
+            //Database.Migrate();
         }
 
         public DbSet<Client> Clients { get; set; }
