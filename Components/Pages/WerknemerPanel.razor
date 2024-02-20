@@ -56,7 +56,8 @@
     protected override async Task OnInitializedAsync()
     {
         Werknemers = WerknemerCollection.GetAllWerknemers();
-        _rowsPerPage = await Storage.GetItemAsync<int>("WerknemerPanelPagination");
+        var num = await Storage.GetItemAsync<int>("WerknemerPanelPagination");
+        if (num > 0) _rowsPerPage = num;
     }
 
     private async Task SetRows(int val)

@@ -46,7 +46,8 @@
     protected override async Task OnInitializedAsync()
     {
         Gemeentes = GemeenteCollection.GetAllGemeentes();
-        _rowsPerPage = await Storage.GetItemAsync<int>("GemeentePanelPagination");
+        var num = await Storage.GetItemAsync<int>("GemeentePanelPagination");
+        if (num > 0) _rowsPerPage = num;
     }
 
     private async Task SetRows(int val)
