@@ -31,7 +31,7 @@
         <MudTd DataLabel="Kleur">
                 <MudIcon Size="Size.Medium" Icon="@Icons.Material.Rounded.Square" Style="@($"color:{context.ColorHexCode};")" />
         </MudTd>
-        <MudTd DataLabel="Start Datum">@context.StartDatum.ToShortDateString()</MudTd>
+        <MudTd DataLabel="Start Datum">@context.StartDatum.Date.ToString("dd-MM-yyyy")</MudTd>
         <MudTd DataLabel="Uren">@context.UrenPerWeek</MudTd>
         <MudTd DataLabel="Actief">
             <MudCheckBox @bind-Value="context.IsActiveInOverview" ReadOnly="true"/>

@@ -34,8 +34,8 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Naam">@context.Initialen @context.Achternaam</MudTd>
-        <MudTd DataLabel="Start Datum">@context.StartDatum.ToShortDateString()</MudTd>
-        <MudTd DataLabel="Eind Datum">@context.EindDatum.ToShortDateString()</MudTd>
+        <MudTd DataLabel="Start Datum">@context.StartDatum.Date.ToString("dd-MM-yyyy")</MudTd>
+        <MudTd DataLabel="Eind Datum">@context.EindDatum.Date.ToString("dd-MM-yyyy")</MudTd>
         <MudTd DataLabel="Zorg Uren">@(context.ZorgUrenHoofd + context.ZorgUrenExtra)</MudTd>
         <MudTd DataLabel="Zorg Type">@context.ZorgType</MudTd>
         <MudTd DataLabel="Hoofd Werknemer">@Werknemers.First(w => w.Id == context.HoofdWerknemerId).Naam</MudTd>

@@ -16,8 +16,8 @@
                     <MudTextField @bind-Value="Client.Achternaam" Label="Achternaam" For="() => Client.Achternaam" ReadOnly="ReadOnly" />
                 </MudItem>
             </MudGrid>
-            <MudDatePicker @bind-Value="Client.StartDatum" Date="Client.StartDatum" Label="Start Datum" Required="true" ReadOnly="ReadOnly" />
-            <MudDatePicker @bind-Value="Client.StartDatum" Date="Client.EindDatum" Label="Eind Datum" Required="true" ReadOnly="ReadOnly" />
+            <MudDatePicker @bind-Date="StartDatum" Label="Start Datum" Required="true" ReadOnly="ReadOnly" />
+            <MudDatePicker @bind-Date="EindDatum" Label="Eind Datum" Required="true" ReadOnly="ReadOnly" />
             <MudGrid>
                 <MudItem xs="9">
                     <MudSelect @bind-Value="Client.HoofdWerknemerId" Label="Hoofd Werknemer" For="() => Client.HoofdWerknemerId" ReadOnly="ReadOnly">
@@ -87,10 +87,14 @@
     [Parameter] public bool ReadOnly { get; set; }
     private IEnumerable<Guid> Extras { get; set; } = new HashSet<Guid>();
     private List<Werknemer> _werknemers;
+    private DateTime? StartDatum;
+    private DateTime? EindDatum;
 
     protected override void OnInitialized()
     {
         _werknemers = WerknemerCollection.GetAllWerknemers().Where(w => w.IsActiveInOverview).ToList();
+        StartDatum = Client.StartDatum;
+        EindDatum = Client.EindDatum;
     }
 
     private void Cancel()
@@ -105,6 +109,8 @@
             Snackbar.Add("Hoofd werknemer en ondersteunende werknemer kunnen niet hetzelfde zijn.", Severity.Error);
             return;
         }
+        Client.StartDatum = (DateTime)StartDatum!;
+        Client.EindDatum = (DateTime)EindDatum!;
         MudDialog.Close(DialogResult.Ok(Client));
     }
 }

@@ -47,16 +47,13 @@ else
                                     <MudLink OnClick="() => Show(client)" Color="Color.Default" Underline="Underline.None" Style="">
                                         <MudText Typo="Typo.body2">@client.Initialen @client.Achternaam</MudText>
                                         <MudText Typo="Typo.body2">Uren: @client.ZorgUrenHoofd</MudText>
-                                        <MudText Typo="Typo.body2">Start: @client.StartDatum.ToShortDateString()</MudText>
-                                        <MudText Typo="Typo.body2">Eind: @client.EindDatum.ToShortDateString()</MudText>
+                                        <MudText Typo="Typo.body2">Start: @client.StartDatum.Date.ToString("dd-MM-yyyy")</MudText>
+                                        <MudText Typo="Typo.body2">Eind: @client.EindDatum.Date.ToString("dd-MM-yyyy")</MudText>
                                         <MudText Typo="Typo.body2">@client.Gemeente.Naam</MudText>
-                                        @if (client.ExtraWerknemerId is not null)
-                                        {
-                                            <div class="d-inline-flex align-items-center">
-                                                <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Dark" />
-                                                <MudText Typo="Typo.body2">@Werknemers.First(w => w.Id == client.ExtraWerknemerId)</MudText>
-                                            </div>
-                                        }
+                                        <div class="d-inline-flex align-items-center">
+                                            <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Dark" />
+                                            <MudText Typo="Typo.body2">@(Werknemers.FirstOrDefault(w => w.Id == client.ExtraWerknemerId)?.Naam ?? "0")</MudText>
+                                        </div>
                                     </MudLink>
                                 </MudPaper>
                             </MudItem>
@@ -68,8 +65,8 @@ else
                                     <MudLink OnClick="() => Show(client)" Color="Color.Default" Underline="Underline.None" Style="">
                                         <MudText Typo="Typo.body2">@client.Initialen @client.Achternaam</MudText>
                                         <MudText Typo="Typo.body2">Uren: @client.ZorgUrenExtra</MudText>
-                                        <MudText Typo="Typo.body2">Start: @client.StartDatum.ToShortDateString()</MudText>
-                                        <MudText Typo="Typo.body2">Eind: @client.EindDatum.ToShortDateString()</MudText>
+                                        <MudText Typo="Typo.body2">Start: @client.StartDatum.Date.ToString("DD-MM-yyyy")</MudText>
+                                        <MudText Typo="Typo.body2">Eind: @client.EindDatum.Date.ToString("DD-MM-yyyy")</MudText>
                                         <MudText Typo="Typo.body2">@client.Gemeente.Naam</MudText>
                                     </MudLink>
                                 </MudPaper>
