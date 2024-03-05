@@ -240,12 +240,12 @@ namespace OCWebOverview.Migrations
                     b.Property<Guid>("HoofdWerknemerId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Initialen")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("StartDatum")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Voornaam")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("ZorgType")
                         .HasColumnType("integer");

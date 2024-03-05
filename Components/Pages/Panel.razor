@@ -21,6 +21,8 @@
 <div style="flex:auto; flex-direction:column;">
     <header style="background-color:#ffa024; position: fixed; top: 0; height:10px; width: 100%"></header>
     <img src="oclogo.png" style="height:8vh" />
+    <MudText Class="d-inline-flex align-items-center px-2" Typo="Typo.body1">Totaal Zorguren: @Clients.SelectMany(c => new[] { c.ZorgUrenHoofd, c.ZorgUrenExtra }).Sum()</MudText>
+    <MudText Class="d-inline-flex align-items-center px-2" Typo="Typo.body1">Totaal Werkuren: @Werknemers.Select(c => c.UrenPerWeek).Sum()</MudText>
 @if (_id != ApplicationSettings.Value.PanelId)
 {
     <MudText Typo="Typo.body1">Geen toegang tot deze content!</MudText>
@@ -33,27 +35,32 @@ else
             {
                 var clientsPerWerknemer = Clients.Where(c => c.HoofdWerknemerId == werknemer.Id).ToList();
                 var onderSteuningsClients = Clients.Where(c => c.ExtraWerknemerId == werknemer.Id).ToList();
-                <MudPaper Class="ma-1" Width="150px" Style="display: flex; flex-direction: column; overflow-y:auto">
-                    <div class="px-3 pt-1 d-inline-flex align-items-center">
+                <MudPaper Class="ma-1" Width="150px" Style="display: flex; flex-direction: column; ">
+                    <div class="px-3 py-1 d-inline-flex align-items-center">
                         <MudText Typo="Typo.h6">@werknemer.Naam</MudText>
-                            <MudIcon Size="Size.Small" Icon="@Icons.Material.Rounded.Square" Style="@($"color:{werknemer.ColorHexCode};")" />
-                            <MudText Typo="Typo.h6">@werknemer.UrenPerWeek</MudText>
-                        </div>
-                    <div Class="mud-grid d-inline-flex x-overflow-auto">
+                        <MudIcon Size="Size.Small" Icon="@Icons.Material.Rounded.Square" Style="@($"color:{werknemer.ColorHexCode};")" />
+                        <MudText Typo="Typo.h6">@werknemer.UrenPerWeek</MudText>
+                    </div>
+                    <div Class="mud-grid d-inline-flex x-overflow-auto" style="overflow-y:auto;">
                         @foreach (var client in clientsPerWerknemer)
                         {
                             <MudItem Class="pa-1" xs="12">
                                 <MudPaper Class="pa-1" Elevation="4" Outlined="true" Style="background-color:#8ffc60">
                                     <MudLink OnClick="() => Show(client)" Color="Color.Default" Underline="Underline.None" Style="">
-                                        <MudText Typo="Typo.body2">@client.Initialen @client.Achternaam</MudText>
-                                        <MudText Typo="Typo.body2">Uren: @client.ZorgUrenHoofd</MudText>
+                                        <MudText Typo="Typo.body2">@client.Voornaam @client.Achternaam</MudText>
+                                        <div class="d-inline-flex align-items-center">
+                                                    <MudText Typo="Typo.body2">Uren: @client.ZorgUrenHoofd</MudText>
+                                            @if (Werknemers.FirstOrDefault(w => w.Id == client.ExtraWerknemerId) != null)
+                                            {
+                                                <div class="d-inline-flex align-items-center">
+                                                    <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Dark" Size="Size.Small"/>
+                                                    <MudText Typo="Typo.body2">@(Werknemers.FirstOrDefault(w => w.Id == client.ExtraWerknemerId)?.Naam ?? "0")</MudText>
+                                                </div>
+                                            }
+                                        </div>
                                         <MudText Typo="Typo.body2">Start: @client.StartDatum.Date.ToString("dd-MM-yyyy")</MudText>
                                         <MudText Typo="Typo.body2">Eind: @client.EindDatum.Date.ToString("dd-MM-yyyy")</MudText>
                                         <MudText Typo="Typo.body2">@client.Gemeente.Naam</MudText>
-                                        <div class="d-inline-flex align-items-center">
-                                            <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Dark" />
-                                            <MudText Typo="Typo.body2">@(Werknemers.FirstOrDefault(w => w.Id == client.ExtraWerknemerId)?.Naam ?? "0")</MudText>
-                                        </div>
                                     </MudLink>
                                 </MudPaper>
                             </MudItem>
@@ -63,7 +70,7 @@ else
                             <MudItem Class="pa-1" xs="12">
                                 <MudPaper Class="pa-1" Elevation="4" Outlined="true" Style="background-color:#ffa024">
                                     <MudLink OnClick="() => Show(client)" Color="Color.Default" Underline="Underline.None" Style="">
-                                        <MudText Typo="Typo.body2">@client.Initialen @client.Achternaam</MudText>
+                                        <MudText Typo="Typo.body2">@client.Voornaam @client.Achternaam</MudText>
                                         <MudText Typo="Typo.body2">Uren: @client.ZorgUrenExtra</MudText>
                                         <MudText Typo="Typo.body2">Start: @client.StartDatum.Date.ToString("DD-MM-yyyy")</MudText>
                                         <MudText Typo="Typo.body2">Eind: @client.EindDatum.Date.ToString("DD-MM-yyyy")</MudText>
@@ -73,8 +80,8 @@ else
                             </MudItem>
                         }
                     </div>
-                        <MudText Class="pa-2" Typo="Typo.body2">Totaal: @(clientsPerWerknemer.Select(c => c.ZorgUrenHoofd).Sum() + onderSteuningsClients.Select(c => c.ZorgUrenExtra).Sum())</MudText>
-                    </MudPaper>
+                    <MudText Class="pa-2" Typo="Typo.body2">Totaal: @(clientsPerWerknemer.Select(c => c.ZorgUrenHoofd).Sum() + onderSteuningsClients.Select(c => c.ZorgUrenExtra).Sum())</MudText>
+                </MudPaper>
             }
         </div>
     </div>
@@ -107,6 +114,9 @@ else
 
     private async void StateChange(object? sender, EventArgs e)
     {
+        Clients = ClientCollection.GetAllClients();
+        Gemeentes = GemeenteCollection.GetAllGemeentes();
+        Werknemers = WerknemerCollection.GetAllWerknemers().Where(werknemer => werknemer.IsActiveInOverview);
         await InvokeAsync(StateHasChanged);
     }
 

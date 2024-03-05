@@ -16,7 +16,7 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">Gemeentes</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
         <MudTh><MudTableSortLabel SortBy="new Func<Gemeente, object>(x=>x.Naam)">Naam</MudTableSortLabel></MudTh>
@@ -40,7 +40,7 @@
 
 @code {
     private IEnumerable<Gemeente> Gemeentes;
-    private string searchString = "";
+    private string _searchString = "";
     private int _rowsPerPage = 10;
 
     protected override async Task OnInitializedAsync()
@@ -102,10 +102,11 @@
 
     private bool FilterFunc(Gemeente element)
     {
-        if (string.IsNullOrWhiteSpace(searchString)) return true;
-        if (element.Naam.Contains(searchString)) return true;
-        if (element.KantoorLocatie.Postcode.Contains(searchString)) return true;
-        if (element.KantoorLocatie.Straat.Contains(searchString)) return true;
-        return element.KantoorLocatie.Plaats.Contains(searchString);
+        var lowerSearchString = _searchString.ToLower();
+        if (string.IsNullOrWhiteSpace(lowerSearchString)) return true;
+        if (element.Naam.ToLower().Contains(lowerSearchString)) return true;
+        if (element.KantoorLocatie.Postcode.ToLower().Contains(lowerSearchString)) return true;
+        if (element.KantoorLocatie.Straat.ToLower().Contains(lowerSearchString)) return true;
+        return element.KantoorLocatie.Plaats.ToLower().Contains(lowerSearchString);
     }
 }

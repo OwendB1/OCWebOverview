@@ -12,7 +12,7 @@
                     <MudNumericField @bind-Value="Werknemer.UrenPerWeek" Label="Uren Per Week"/>
                 </MudItem>
             </MudGrid>
-            <MudDatePicker @bind-Value="Werknemer.StartDatum" Date="Werknemer.StartDatum" Label="Start Datum" />
+            <MudDatePicker @bind-Date="StartDatum" Label="Start Datum" Required="true" />
             <MudColorPicker @bind-Text="Werknemer.ColorHexCode" Label="Kleur" ColorPickerMode="ColorPickerMode.HEX"/>
             <MudSwitch @bind-Value="Werknemer.IsActiveInOverview" Label="Zichtbaar in overview?" Color="Color.Success"/>
         </EditForm>
@@ -27,6 +27,12 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Werknemer Werknemer { get; set; }
     [Parameter] public string ButtonText { get; set; }
+    private DateTime? StartDatum;
+
+    protected override void OnInitialized()
+    {
+        StartDatum = Werknemer.StartDatum;
+    }
 
     private void Cancel()
     {
@@ -35,6 +41,7 @@
 
     private void Submit()
     {
+        Werknemer.StartDatum = (DateTime)StartDatum!;
         MudDialog.Close(DialogResult.Ok(Werknemer));
     }
 }

@@ -113,7 +113,7 @@
     private bool FilterFunc(Werknemer element)
     {
         if (string.IsNullOrWhiteSpace(searchString)) return true;
-        if (element.Naam.Contains(searchString)) return true;
+        if (element.Naam.ToLower().Contains(searchString.ToLower())) return true;
         return element.StartDatum.Date.ToShortDateString().Contains(searchString);
     }
 }

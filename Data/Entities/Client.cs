@@ -8,7 +8,7 @@ namespace OCWebOverview.Data.Entities
         [Key]
         public Guid Id { get; set; }
         [Required(ErrorMessage = "Dit veld is benodigd.")]
-        public string Initialen { get; set; }
+        public string Voornaam { get; set; }
 
         [Required(ErrorMessage = "Dit veld is benodigd.")]
         public string Achternaam { get; set; }
@@ -51,10 +51,10 @@ namespace OCWebOverview.Data.Entities
         public virtual Gemeente Gemeente { get; set; }
         #endregion
 
-        public Client(string initialen, string achternaam, DateTime startDatum, DateTime eindDatum, int zorgUrenHoofd, int zorgUrenExtra, Guid hoofdWerknemerId, Guid? extraWerknemerId, ZorgType zorgType, Guid gemeenteId, Adres adres, Guid? id = null)
+        public Client(string voornaam, string achternaam, DateTime startDatum, DateTime eindDatum, int zorgUrenHoofd, int zorgUrenExtra, Guid hoofdWerknemerId, Guid? extraWerknemerId, ZorgType zorgType, Guid gemeenteId, Adres adres, Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
-            Initialen = initialen;
+            Voornaam = voornaam;
             Achternaam = achternaam;
             StartDatum = startDatum;
             EindDatum = eindDatum;

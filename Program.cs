@@ -44,9 +44,9 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-builder.Services.AddScoped<ClientCollection>();
-builder.Services.AddScoped<GemeenteCollection>();
-builder.Services.AddScoped<WerknemerCollection>();
+builder.Services.AddSingleton<ClientCollection>();
+builder.Services.AddSingleton<GemeenteCollection>();
+builder.Services.AddSingleton<WerknemerCollection>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -63,11 +63,11 @@ var connectionBuilder = new PostgreSqlConnectionStringBuilder(builder.Environmen
     SslMode = SslMode.Require
 };
 
-builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddSingleton<IEmailSender, EmailSender>();
 builder.Services.Configure<AuthOptions>(builder.Configuration);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionBuilder.ConnectionString));
+    options.UseNpgsql(connectionBuilder.ConnectionString), ServiceLifetime.Singleton);
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)

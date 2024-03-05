@@ -33,7 +33,7 @@
         <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Naam">@context.Initialen @context.Achternaam</MudTd>
+        <MudTd DataLabel="Naam">@context.Voornaam @context.Achternaam</MudTd>
         <MudTd DataLabel="Start Datum">@context.StartDatum.Date.ToString("dd-MM-yyyy")</MudTd>
         <MudTd DataLabel="Eind Datum">@context.EindDatum.Date.ToString("dd-MM-yyyy")</MudTd>
         <MudTd DataLabel="Zorg Uren">@(context.ZorgUrenHoofd + context.ZorgUrenExtra)</MudTd>
@@ -66,6 +66,12 @@
         Clients = ClientCollection.GetAllClients();
         Gemeentes = GemeenteCollection.GetAllGemeentes();
         Werknemers = WerknemerCollection.GetAllWerknemers();
+        var duplicates = Clients.GroupBy(c => new { c.Voornaam, c.Achternaam }).Where(c => c.Count() > 1);
+        foreach (var duplicate in duplicates)
+        {
+            Snackbar.Add($"De cliënt {duplicate.Key.Voornaam} {duplicate.Key.Achternaam} bestaat dubbel in het systeem.", Severity.Warning, options => { options.RequireInteraction = true; });
+        }
+        
         var num = await Storage.GetItemAsync<int>("ClientPanelPagination");
         if (num > 0) _rowsPerPage = num;
     }
@@ -124,10 +130,13 @@
 
     private bool FilterFunc(Client element)
     {
-        if (string.IsNullOrWhiteSpace(_searchString)) return true;
-        if (element.Achternaam.Contains(_searchString)) return true;
-        if (element.Adres.Postcode.Contains(_searchString)) return true;
+        var lowerSearchString = _searchString.ToLower();
+        if (string.IsNullOrWhiteSpace(lowerSearchString)) return true;
+        if (element.Voornaam.ToLower().Contains(lowerSearchString)) return true;
+        if (element.Achternaam.ToLower().Contains(lowerSearchString)) return true;
+        if (element.Adres.Postcode.ToLower().Contains(lowerSearchString)) return true;
         if (element.StartDatum.Date.ToShortDateString().Contains(_searchString)) return true;
-        return element.ZorgUrenHoofd + element.ZorgUrenExtra == int.Parse(_searchString);
+        var res = int.TryParse(_searchString, out var number);
+        return res && element.ZorgUrenHoofd + element.ZorgUrenExtra == number;
     }
 }

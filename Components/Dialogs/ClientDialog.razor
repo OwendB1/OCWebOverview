@@ -2,6 +2,7 @@
 @using OCWebOverview.Data.Collections
 @inject WerknemerCollection WerknemerCollection
 @inject GemeenteCollection GemeenteCollection
+@inject ClientCollection ClientCollection
 @inject ISnackbar Snackbar
 
 <EditForm Model="@Client" OnValidSubmit="Submit">
@@ -9,10 +10,10 @@
     <MudDialog>
         <DialogContent>
             <MudGrid>
-                <MudItem xs="3">
-                    <MudTextField @bind-Value="Client.Initialen" Label="Initialen" For="() => Client.Initialen" ReadOnly="ReadOnly" />
+                <MudItem xs="5">
+                    <MudTextField @bind-Value="Client.Voornaam" Label="Voornaam" For="() => Client.Voornaam" ReadOnly="ReadOnly" />
                 </MudItem>
-                <MudItem xs="9">
+                <MudItem xs="7">
                     <MudTextField @bind-Value="Client.Achternaam" Label="Achternaam" For="() => Client.Achternaam" ReadOnly="ReadOnly" />
                 </MudItem>
             </MudGrid>
@@ -33,7 +34,7 @@
             </MudGrid>
            <MudGrid>
                 <MudItem xs="9">
-                    <MudSelect T="Guid?" @bind-Select="Client.ExtraWerknemerId" Label="Ondersteunende Werknemer" Clearable="true" ReadOnly="ReadOnly">
+                    <MudSelect @bind-Value="Client.ExtraWerknemerId" Label="Ondersteunende Werknemer" Clearable="true" ReadOnly="ReadOnly">
                         @foreach (var werknemer in _werknemers)
                         {
                             <MudSelectItem Value="(Guid?)werknemer.Id">@werknemer.Naam</MudSelectItem>
@@ -104,6 +105,11 @@
 
     private void Submit()
     {
+        if (ClientCollection.GetAllClients().Count(c => c.Voornaam == Client.Voornaam && c.Achternaam == Client.Achternaam) > 1)
+        {
+            Snackbar.Add("Er bestaat al een clïent met deze combinatie van voornaam en achternaam. U kunt niet nog een toevoegen.", Severity.Error);
+            return;
+        }
         if (Client.HoofdWerknemerId == Client.ExtraWerknemerId)
         {
             Snackbar.Add("Hoofd werknemer en ondersteunende werknemer kunnen niet hetzelfde zijn.", Severity.Error);

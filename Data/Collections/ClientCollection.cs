@@ -6,10 +6,10 @@ namespace OCWebOverview.Data.Collections
 {
     public class ClientCollection(ApplicationDbContext dbContext)
     {
-        public event EventHandler? DataChanged;
+        public event EventHandler DataChanged;
         protected virtual void DataHasChanged()
         {
-            DataChanged?.Invoke(this, EventArgs.Empty);
+            DataChanged.Invoke(this, EventArgs.Empty);
         }
 
         public IEnumerable<Client> GetAllClients()
@@ -28,7 +28,7 @@ namespace OCWebOverview.Data.Collections
         {
             var entry = dbContext.Clients.FirstOrDefault(client => client.Id == c.Id);
             if (entry is null) return false;
-            entry.Initialen = c.Initialen;
+            entry.Voornaam = c.Voornaam;
             entry.Achternaam = c.Achternaam;
             entry.GemeenteId = c.GemeenteId;
             entry.Adres = c.Adres;
