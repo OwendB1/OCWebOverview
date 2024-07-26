@@ -38,9 +38,9 @@
         <MudTd DataLabel="Eind Datum">@context.EindDatum.Date.ToString("dd-MM-yyyy")</MudTd>
         <MudTd DataLabel="Zorg Uren">@(context.ZorgUrenHoofd + context.ZorgUrenExtra)</MudTd>
         <MudTd DataLabel="Zorg Type">@context.ZorgType</MudTd>
-        <MudTd DataLabel="Hoofd Werknemer">@Werknemers.FirstOrDefault(w => w.Id == context.HoofdWerknemerId).Naam</MudTd>
+        <MudTd DataLabel="Hoofd Werknemer">@Werknemers.FirstOrDefault(w => w.Id == context.HoofdWerknemerId)?.Naam</MudTd>
         <MudTd DataLabel="PC & Hnmr">@(!context.Adres.Postcode.IsNullOrEmpty() ? $"{context.Adres.Postcode}, {context.Adres.HuisNummer}" : "Niet Ingevuld")</MudTd>
-        <MudTd DataLabel="Gemeente">@Gemeentes.FirstOrDefault(g => g.Id == context.GemeenteId).Naam</MudTd>
+        <MudTd DataLabel="Gemeente">@Gemeentes.FirstOrDefault(g => g.Id == context.GemeenteId)?.Naam</MudTd>
         <MudTd DataLabel="Buttons">
             <div class="d-inline-flex">
                 <MudButton Variant="Variant.Filled" OnClick="() => Edit(context)" Class="mr-2">Edit</MudButton>
